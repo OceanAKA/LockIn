@@ -1,0 +1,58 @@
+{
+  "name": "lock-in",
+  "productName": "Lock In",
+  "version": "1.0.0",
+  "description": "Auto-plays Spotify in menus and while you're dead in Valorant, League of Legends, and Marvel Rivals. Pauses when the round goes live.",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "icon": "electron build/make-icon.js",
+    "dist": "electron-builder --win"
+  },
+  "author": "Ocean Arbeit",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.oceanarbeit.lockin",
+    "productName": "Lock In",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "zip"
+      ],
+      "icon": "build/icon.ico",
+      "compression": "maximum"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Lock In",
+      "runAfterFinish": false,
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "Lock In (portable) ${version}.exe",
+      "unpackDirName": "LockIn"
+    },
+    "afterPack": "build/afterPack.js",
+    "electronLanguages": [
+      "en-US"
+    ],
+    "compression": "maximum"
+  }
+}

@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<title>Lock In</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="bar">
+  <div id="drag"><span class="brand">Lock In</span></div>
+  <button id="btnSettings" class="icon" title="Settings">&#9881;</button>
+  <button id="btnTray" class="icon" title="Minimise">&#8211;</button>
+  <button id="btnQuit" class="icon" title="Quit">&#10005;</button>
+</div>
+
+<div id="compactView">
+  <button id="power" class="power"><span id="powerLabel">ON</span></button>
+  <div class="cstat">
+    <div id="cGame" class="cgame">nothing detected</div>
+    <div id="cMusic" class="cmusic">standing by</div>
+  </div>
+</div>
+
+<div id="fullView">
+
+<div class="statusbar">
+  <div class="sb"><label>Game</label><b id="activeGame">&mdash;</b></div>
+  <div class="sb"><label>Phase</label><b id="phase">&mdash;</b></div>
+  <div class="sb"><label>You are</label><b id="alive">&mdash;</b></div>
+  <div class="sb"><label>Music</label><b id="verdict">&mdash;</b></div>
+</div>
+<div id="err" class="err hidden"></div>
+
+<nav class="nav" id="nav">
+  <button class="navtab on" data-pane="music">Music</button>
+  <button class="navtab" data-pane="death">Death</button>
+  <button class="navtab" data-pane="hype">Hype</button>
+  <button class="navtab" data-pane="games">Games</button>
+  <button class="navtab" data-pane="app">App</button>
+</nav>
+
+<!-- ---------------------------------------------------------------- Music -->
+<section class="pane on" data-pane="music">
+  <h2>What to control</h2>
+  <p class="note">Uses Windows' own media controls, so it works with YouTube in
+     any browser, YouTube Music, Spotify's desktop app and most other players.
+     Only ever play and pause &mdash; your volume is never touched.</p>
+  <label>Player</label>
+  <div class="sel"><select id="mediaAppId"></select></div>
+  <div class="btns">
+    <button id="refreshSessions">Rescan</button>
+    <button id="test">Test playback</button>
+  </div>
+  <div id="testResult" class="result"></div>
+</section>
+
+<!-- ---------------------------------------------------------------- Death -->
+<section class="pane" data-pane="death">
+  <h2>How death is detected</h2>
+  <p class="note">Lock In watches for the <b>KILLED BY</b> banner using the OCR
+     engine built into Windows. The text is either on screen or it isn't, so
+     there is nothing to calibrate and nothing to guess.</p>
+
+  <label class="check"><input type="checkbox" id="kEnabled"> <span>Watch for the death banner</span></label>
+  <label class="check"><input type="checkbox" id="kDeathSignal"> <span>Use it to detect death</span></label>
+
+  <label>Where to look</label>
+  <div class="sel"><select id="kRegion">
+    <option value="right">Right side of the screen</option>
+    <option value="full">Whole screen &mdash; slower, use if it misses</option>
+  </select></div>
+
+  <div class="statgrid">
+    <div><label>OCR engine</label><b id="kOcr" class="pill">&mdash;</b></div>
+    <div><label>Last killed by</label><b id="kLast" class="pill">&mdash;</b></div>
+  </div>
+
+  <div class="btns">
+    <button id="kTest" class="primary">Test read now</button>
+    <button id="kClear" class="ghost">Clear tally</button>
+  </div>
+  <div id="kResult" class="result"></div>
+
+  <h3>Who kills you most</h3>
+  <div id="kTally" class="tally"><p class="note">Nothing yet.</p></div>
+</section>
+
+<!-- ----------------------------------------------------------------- Hype -->
+<section class="pane" data-pane="hype">
+  <h2>Hype mode</h2>
+  <p class="note">When it comes down to <b>you against one of them</b>, your
+     hype music kicks in &mdash; the one time music plays while you're alive.
+     It stops when the round ends.</p>
+
+  <label class="check"><input type="checkbox" id="hEnabled"> <span>Turn on hype mode</span></label>
+
+  <label>Hype music</label>
+  <input id="hSource" placeholder="Spotify link, YouTube link, or a folder of tracks">
+  <p class="note" id="hSourceHint">Right-click a Kryd playlist or track in Spotify &rarr;
+     Share &rarr; Copy link and paste it here. A YouTube URL works too, or the path to
+     a folder of MP3s to play from the app itself.</p>
+
+  <div class="statgrid">
+    <div><label>Now</label><b id="hState" class="pill">&mdash;</b></div>
+    <div><label>Alive (you / them)</label><b id="hCounts" class="pill">&mdash;</b></div>
+  </div>
+
+  <div class="btns">
+    <button id="hTest" class="primary">Test the drop</button>
+    <button id="hScan">Scan HUD now</button>
+  </div>
+  <div id="hResult" class="result"></div>
+
+  <h3>What the scanner sees</h3>
+  <p class="note">Valorant prints how many are alive on each team in the two small
+     boxes beside the round timer. Lock In reads those digits off the screen: a
+     <b>1</b> is a thin vertical bar, every other digit is wide. Scan mid-round and
+     the digit it found is outlined.</p>
+  <div id="hPreviewWrap" class="pills hidden">
+    <div><label>Your side</label><canvas id="hPreviewL"></canvas></div>
+    <div><label>Their side</label><canvas id="hPreviewR"></canvas></div>
+  </div>
+
+  <label>Where the boxes sit (% of screen)</label>
+  <div class="grid2">
+    <div><label>Distance from centre</label><input type="number" id="hOffset" min="2" max="20" step="0.2"></div>
+    <div><label>Top edge</label><input type="number" id="hTop" min="0" max="10" step="0.2"></div>
+  </div>
+
+  <label class="check"><input type="checkbox" id="hCard"> <span>Flash a "LOCK IN" card when it starts</span></label>
+</section>
+
+<!-- ---------------------------------------------------------------- Games -->
+<section class="pane" data-pane="games">
+  <div class="tabs" id="tabs"></div>
+  <div id="gamePanel"></div>
+</section>
+
+<!-- ------------------------------------------------------------------ App -->
+<section class="pane" data-pane="app">
+  <h2>When you die</h2>
+  <label class="check"><input type="checkbox" id="rEnabled"> <span>Show a reminder</span></label>
+  <label>Message</label>
+  <input id="rText" placeholder="Do 5 pushups">
+  <div class="grid2">
+    <div><label>Show for (seconds)</label><input type="number" id="rSeconds" min="1" max="30"></div>
+    <div><label>Deaths this session</label><input id="rDeaths" readonly></div>
+  </div>
+  <label class="check"><input type="checkbox" id="rOverlay"> <span>Show it on screen</span></label>
+  <label class="check"><input type="checkbox" id="rSpeak"> <span>Say it out loud</span></label>
+  <label class="check"><input type="checkbox" id="rCount"> <span>Keep a running tally</span></label>
+  <p class="note warn">The card can't draw over a game in <b>exclusive
+     fullscreen</b> &mdash; Windows blocks that for every app. Use borderless, or
+     turn on "Say it out loud".</p>
+  <div class="btns">
+    <button id="rTest">Preview it</button>
+    <button id="rReset" class="ghost">Reset tally</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2>Window</h2>
+  <label class="check"><input type="checkbox" id="alwaysOnTop"> <span>Keep on top of other windows</span></label>
+  <label class="check"><input type="checkbox" id="startWithWindows"> <span>Start with Windows</span></label>
+  <p class="note"><b>&ndash;</b> minimises to the taskbar. <b>Hide to tray</b>
+     makes it vanish, leaving the tray icon. <b>&times;</b> quits. It keeps
+     watching your game either way.</p>
+  <div class="btns"><button id="toTray">Hide to tray</button></div>
+</section>
+
+</div>
+
+<script src="renderer.js"></script>
+</body>
+</html>

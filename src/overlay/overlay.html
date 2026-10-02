@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>Lock In reminder</title>
+<style>
+  html, body {
+    margin: 0; height: 100%;
+    background: transparent;
+    overflow: hidden;
+    font: 600 15px/1.3 system-ui, "Segoe UI", sans-serif;
+    -webkit-user-select: none;
+    cursor: default;
+  }
+  #wrap {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: translateY(-12px) scale(.97);
+    transition: opacity .2s cubic-bezier(.4,0,.2,1),
+                transform .28s cubic-bezier(.2,.9,.3,1.1);
+  }
+  #wrap.on { opacity: 1; transform: translateY(0) scale(1); }
+
+  #card {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 16px;
+    padding: 15px 26px 15px 22px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(22,26,33,.96), rgba(12,15,19,.96));
+    border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 18px 48px -12px rgba(0,0,0,.75),
+                0 0 0 1px rgba(29,185,84,.14),
+                inset 0 1px 0 rgba(255,255,255,.05);
+    color: #f0f2f5;
+    white-space: nowrap;
+  }
+  /* A thin accent edge instead of a full coloured border — reads cleaner. */
+  #card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, #1DB954, rgba(29,185,84,.35));
+  }
+
+  #bars { display: flex; align-items: flex-end; gap: 3.5px; height: 28px; }
+  #bars i {
+    width: 4px; border-radius: 2px;
+    background: linear-gradient(180deg, #35d873, #1DB954);
+    animation: b .9s ease-in-out infinite;
+  }
+  #bars i:nth-child(1) { height: 40%; animation-delay: 0s; }
+  #bars i:nth-child(2) { height: 75%; animation-delay: .15s; }
+  #bars i:nth-child(3) { height: 55%; animation-delay: .3s; }
+  #bars i:nth-child(4) { height: 90%; animation-delay: .45s; }
+  @keyframes b { 0%, 100% { transform: scaleY(.55); } 50% { transform: scaleY(1); } }
+
+  #text { font-size: 23px; font-weight: 650; letter-spacing: -.3px; }
+  #sub {
+    font-size: 11.5px; font-weight: 500; letter-spacing: .3px;
+    text-transform: uppercase; color: #7f8896;
+    border-left: 1px solid rgba(255,255,255,.1); padding-left: 16px;
+  }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <div id="card">
+      <div id="bars"><i></i><i></i><i></i><i></i></div>
+      <div id="text">Do 5 pushups</div>
+      <div id="sub" hidden></div>
+    </div>
+  </div>
+<script>
+  const wrap = document.getElementById('wrap');
+  const text = document.getElementById('text');
+  const sub = document.getElementById('sub');
+  let hideTimer = null;
+
+  window.overlay.onShow(({ message, note }) => {
+    text.textContent = message;
+    if (note) { sub.textContent = note; sub.hidden = false; } else { sub.hidden = true; }
+    // Restart the entrance animation even if it's already visible.
+    wrap.classList.remove('on');
+    void wrap.offsetWidth;
+    wrap.classList.add('on');
+    if (hideTimer) clearTimeout(hideTimer);
+  });
+
+  window.overlay.onHide(() => {
+    wrap.classList.remove('on');
+  });
+</script>
+</body>
+</html>
